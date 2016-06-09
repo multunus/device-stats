@@ -1,6 +1,7 @@
 package com.multunus.devicestats;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
@@ -11,6 +12,9 @@ import android.support.annotation.NonNull;
 
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -25,7 +29,7 @@ public class WifiStats {
         this.activityContext = activityContext;
         wiFiStats = null;
     }
-    HashMap<String, String> fetchWiFiStats(){
+    public HashMap<String, String> fetchWiFiStats(){
         NetworkInfo mWifi = null;
         ConnectivityManager connManager = (ConnectivityManager) activityContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         WifiManager wifiManager = (WifiManager) activityContext.getSystemService(activityContext.WIFI_SERVICE);
@@ -56,7 +60,14 @@ public class WifiStats {
         }
         return wiFiStats;
     }
-
+    private String fetchLastConnectedAt(){
+        SharedPreferences sharedPref = activityContext.getSharedPreferences(activityContext.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        long lastConnectedAt = sharedPref.getLong(this.activityContext.getString(R.string.preference_last_connected_key), 0);
+        Date date = new Date(lastConnectedAt);
+        DateFormat formatter = new SimpleDateFormat("F MMM yyyy HH:mm:ss");
+        String dateFormatted = formatter.format(date);
+        return dateFormatted;
+    }
     private void initializeWithKnownValues(WifiManager wifiManager, WifiInfo wifiInfo, HashMap wiFiStats) {
         wiFiStats.put("isEnabled", wifiManager.isWifiEnabled());
         wiFiStats.put("isConnected", "false");
@@ -64,6 +75,7 @@ public class WifiStats {
         wiFiStats.put("wifiSSID", "NotConnected");
         wiFiStats.put("macAddress", wifiInfo.getMacAddress());
         wiFiStats.put("wifiSSID", wifiInfo.getSSID());
+        wiFiStats.put("lastConnected", fetchLastConnectedAt());
     }
 
     private NetworkInfo getNetworkInfoForNewAndroidAPI(ConnectivityManager connManager) {

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DeviceStats</string>
+    <string name="preference_file_key">com.multunus.devicestats.PREFERENCE_FILE_KEY</string>
+    <string name="preference_last_connected_key">com.multunus.devicestats.LAST_CONNECTED</string>
 </resources>
